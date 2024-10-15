@@ -10,7 +10,12 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.8.2",
+    "@nuxtjs/tailwindcss": "^6.12.1",
+    "@pinia/nuxt": "^0.5.5",
+    "@vueuse/nuxt": "^11.1.0",
     "nuxt": "^3.13.0",
+    "pinia": "^2.2.4",
     "vue": "latest",
     "vue-router": "latest"
   }

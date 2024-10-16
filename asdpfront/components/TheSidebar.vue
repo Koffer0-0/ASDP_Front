@@ -18,7 +18,7 @@ const secondList = [
 
 const bottomList = [
   {icon: IconSettings, link: "/settings", name: "Настройки"},
-  {icon: IconTurn, link: "/profile", name: "Выйти"}
+  {icon: IconTurn, link: "/login", name: "Выйти"}
 ]
 </script>
 

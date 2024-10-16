@@ -86,10 +86,10 @@ import IconNotification from "~/components/icons/IconNotification.vue";
               </a>
             </div>
           </div>
-          <!-- Apps -->
 
           <!-- Dropdown menu -->
-          <button
+          <a
+              href="/profile"
               type="button"
               class="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
               id="user-menu-button"
@@ -102,7 +102,7 @@ import IconNotification from "~/components/icons/IconNotification.vue";
                 src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png"
                 alt="user photo"
             />
-          </button>
+          </a>
           <!-- Dropdown menu -->
           <div
               class="hidden z-50 my-4 w-56 text-base list-none bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl"

@@ -1,11 +1,7 @@
 <template>
-  <div>
-    <the-navbar/>
-    <the-sidebar/>
-    <main class="p-4 md:ml-64 h-screen pt-20 bg-gray-100">
+    <NuxtLayout>
         <NuxtPage />
-    </main>
-  </div>
+    </NuxtLayout>
 </template>
 
 <script setup lang="ts">

@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <<ContentHeader title="Документы">>
+  <ContentHeader title="Настройки">>
     <template #button>
       <BaseButton text="Test"/>
     </template>

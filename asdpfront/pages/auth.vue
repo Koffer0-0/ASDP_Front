@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import {useSigex} from "~/composables/useSigex";
+
 definePageMeta({
   layout: 'full-screen'  // Specify the full-screen layout
 });
 
-const triggerSigexLogin = () => {
+const { auth } = useSigex()
 
+const triggerSigexLogin = async () => {
+  await auth()
 }
 </script>
 

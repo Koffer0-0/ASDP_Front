@@ -1,25 +1,23 @@
-import {NCALayerClient} from "ncalayer-js-client"
+import { NCALayerClient } from "ncalayer-js-client";
+import { ref } from "vue";
+import axios from "axios"; // Use axios for HTTP requests
 
 export function useSigex() {
-
-    const domenFull = "https://sigex.kz"
-    const domen = "sigex.kz"
-    const title = 'nca_tests';
-    const file: File | null;
-
-    const documentSign: string = "";
-    const textSign: string = "";
-
-    const textToSign: string;
-
-    const jwt: string
+    const domenFull = ref("https://sigex.kz");
+    const domen = "sigex.kz";
+    const title = ref('nca_tests');
+    const file = ref(null);
+    const documentSign = ref("");
+    const textSign = ref("");
+    const textToSign = ref("");
+    const jwt = ref("");
 
     async function signDocument() {
         const ncalayerClient = new NCALayerClient();
 
         try {
             await ncalayerClient.connect();
-            console.log("connected")
+            console.log("connected");
         } catch (error) {
             window.alert(`Не удалось подключиться к NCALayer: ${error.toString()}`);
             return;
@@ -28,34 +26,25 @@ export function useSigex() {
         let activeTokens;
         try {
             activeTokens = await ncalayerClient.getActiveTokens();
-            console.log("active tokens")
+            console.log("active tokens");
         } catch (error) {
             window.alert(error.toString());
             return;
         }
 
-        // getActiveTokens может вернуть несколько типов хранилищ, для простоты проверим первый.
-        // Иначе нужно просить пользователя выбрать тип носителя.
         const storageType = activeTokens[0] || NCALayerClient.fileStorageType;
-
         const documentInBase64 = 'MTEK';
 
-        console.log("storageType")
-        console.log(storageType)
+        console.log("storageType");
+        console.log(storageType);
         let base64EncodedSignature;
         try {
-            base64EncodedSignature = await ncalayerClient.createCAdESFromBase64(storageType, this.file);
-
-            /*let s = await ncalayerClient.signXml(storageType, '<data>test</data>');
-
-            console.log("signXml");
-            console.log(s)*/
-
-            console.log("base64EncodedSignature")
-            console.log(base64EncodedSignature)
+            base64EncodedSignature = await ncalayerClient.createCAdESFromBase64(storageType, file.value);
+            console.log("base64EncodedSignature");
+            console.log(base64EncodedSignature);
         } catch (error) {
             window.alert(error.toString());
-            console.log(error.toString())
+            console.log(error.toString());
             return;
         }
 
@@ -67,7 +56,7 @@ export function useSigex() {
 
         try {
             await ncalayerClient.connect();
-            console.log("connected")
+            console.log("connected");
         } catch (error) {
             window.alert(`Не удалось подключиться к NCALayer: ${error.toString()}`);
             return;
@@ -76,94 +65,108 @@ export function useSigex() {
         let activeTokens;
         try {
             activeTokens = await ncalayerClient.getActiveTokens();
-            console.log("active tokens")
+            console.log("active tokens");
         } catch (error) {
             window.alert(error.toString());
             return;
         }
 
-        // getActiveTokens может вернуть несколько типов хранилищ, для простоты проверим первый.
-        // Иначе нужно просить пользователя выбрать тип носителя.
         const storageType = activeTokens[0] || NCALayerClient.fileStorageType;
 
-        const documentInBase64 = 'MTEK';
-
-        console.log("storageType")
-        console.log(storageType)
+        console.log("storageType");
+        console.log(storageType);
         let base64EncodedSignature;
         try {
-            base64EncodedSignature = await ncalayerClient.createCAdESFromBase64(storageType, this.textToSign);
-
-            /*let s = await ncalayerClient.signXml(storageType, '<data>test</data>');
-
-            console.log("signXml");
-            console.log(s)*/
-
-            console.log("base64EncodedSignature")
-            console.log(base64EncodedSignature)
+            base64EncodedSignature = await ncalayerClient.createCAdESFromBase64(storageType, textToSign.value);
+            console.log("base64EncodedSignature");
+            console.log(base64EncodedSignature);
+            textSign.value = base64EncodedSignature;
         } catch (error) {
             window.alert(error.toString());
-            console.log(error.toString())
+            console.log(error.toString());
             return;
         }
 
         return base64EncodedSignature;
     }
 
-    function auth() {
-        let headers = new HttpHeaders();
-        headers = headers.set('Content-Type', 'application/json'); // Correct header name
-
-        console.log(this.domenFull)
-        // Pass headers inside options (third parameter)
-        this.http.post(this.domenFull + "/api/auth", {}, {headers})
-            .subscribe(
-                async (res: any) => {
-                    console.log("nonce");
-                    console.log(res.nonce);
-
-                    this.textToSign = res.nonce
-
-                    await this.signTextHandler()
-
-                    this.authStep2()
+    async function auth() {
+        try {
+            const response = await axios.post(`${domenFull.value}/api/auth`, {}, {
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                err => {
-                    console.error("Error occurred:", err);
-                }
-            );
+            });
+
+            console.log("nonce");
+            console.log(response.data.nonce);
+
+            textToSign.value = response.data.nonce;
+
+            await signText();
+
+            await authStep2();
+        } catch (error) {
+            console.error("Error occurred:", error);
+        }
     }
 
-    function registerDocument() {
-        let headers = new HttpHeaders();
-        headers = headers.set('Content-Type', 'application/json'); // Correct header name
-
-        this.http.post(this.domenFull + "/api", {
-            title: "test",
-            signature: this.documentSign,
-            settings: {
-                signersRequirements: [
-                    {
-                        iin: "IIN011226550429",
-                    }
-                ]
-            }
-        }, {headers})
-            .subscribe(
-                async (res: any) => {
-                    console.log("register response");
-                    console.log(res);
+    async function authStep2() {
+        try {
+            const response = await axios.post(`${domenFull.value}/api/auth`, {
+                signature: textSign.value,
+                nonce: textToSign.value,
+                external: false,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                err => {
-                    console.error("Error occurred:", err);
-                }
-            );
+            });
+
+            console.log("res");
+            console.log(response.data);
+
+            console.log("cookies:");
+            console.log(document.cookie);
+
+            jwt.value = response.data;
+            const router = useRouter()
+            // TODO когда стреляешь Подпись нужно тригернуть логин Дениса
+
+            router.push("/")
+        } catch (error) {
+            console.error("Error occurred:", error);
+        }
     }
 
+    async function registerDocument() {
+        try {
+            const response = await axios.post(`${domenFull.value}/api`, {
+                title: "test",
+                signature: documentSign.value,
+                settings: {
+                    signersRequirements: [
+                        {
+                            iin: "IIN011226550429",
+                        }
+                    ]
+                }
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            console.log("register response");
+            console.log(response.data);
+        } catch (error) {
+            console.error("Error occurred:", error);
+        }
+    }
 
     return {
         auth,
-        signText,
         signDocument,
-    }
+        registerDocument,
+    };
 }

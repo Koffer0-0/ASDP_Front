@@ -1,5 +1,8 @@
 <script setup lang="ts">
 
+defineProps({
+  template: {}
+})
 </script>
 
 <template>
@@ -9,12 +12,13 @@
     </a>
     <div class="p-5 flex flex-col items-center justify-center text-center">
       <a href="#">
-        <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">Шаблон</h5>
+        <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">{{ template.name }}</h5>
       </a>
-      <p class="mb-3 text-sm font-normal text-gray-700 dark:text-gray-400">Описание Шаблона</p>
-      <a href="#" class="px-5 py-2 font-medium text-center text-gray-500 border-2 border-gray-400 rounded-md focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+<!--      <p class="mb-3 text-sm font-normal text-gray-700 dark:text-gray-400">Описание Шаблона</p>-->
+      <button @click=""
+          class="px-5 py-2 font-medium text-center text-gray-500 border-2 border-gray-400 rounded-md hover:text-gray-800 hover:border-gray-800 focus:ring-4 focus:outline-none ">
         Изменить
-      </a>
+      </button>
     </div>
   </div>
 </template>

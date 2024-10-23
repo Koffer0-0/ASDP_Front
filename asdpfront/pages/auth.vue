@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import {useSigex} from "~/composables/useSigex";
-import {useAuth} from "~/composables/useAuth";
 
 definePageMeta({
   layout: 'full-screen'  // Specify the full-screen layout
 });
 
 const { auth } = useSigex()
-const { fetchEmployeeByIin } = useAuth()
 
 const triggerSigexLogin = async () => {
-  await auth()
+  await navigateTo({ name: 'register', query: { email: "test@example.com", iin: "123456789", name: "John", surname: "Doe" } });
 }
+
 </script>
 
 <template>

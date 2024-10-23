@@ -1,11 +1,10 @@
 
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_APP_API + 'Documents';
+import {API_DOCUMENTS_ENDPOINT} from "~/constants/consts";
 
 export const loadTemplates = async () => {
   try {
-    const response = await axios.get(`${API_URL}/loadTemplates`);
+    const response = await axios.get(`${API_DOCUMENTS_ENDPOINT}/loadTemplates`);
     return response.data;
   } catch (error) {
     throw error;
@@ -14,7 +13,7 @@ export const loadTemplates = async () => {
 
 export const addTemplate = async (templateData: FormData) => {
   try {
-    const response = await axios.post(`${API_URL}/addTemplate`, templateData, {
+    const response = await axios.post(`${API_DOCUMENTS_ENDPOINT}/addTemplate`, templateData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
@@ -25,7 +24,7 @@ export const addTemplate = async (templateData: FormData) => {
 
 export const getDocument = async (documentId: string) => {
   try {
-    const response = await axios.get(`${API_URL}/getDocument/${documentId}`);
+    const response = await axios.get(`${API_DOCUMENTS_ENDPOINT}/getDocument/${documentId}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -34,7 +33,7 @@ export const getDocument = async (documentId: string) => {
 
 export const getTemplate = async (templateId: string) => {
   try {
-    const response = await axios.get(`${API_URL}/getTemplate/${templateId}`);
+    const response = await axios.get(`${API_DOCUMENTS_ENDPOINT}/getTemplate/${templateId}`);
     return response.data;
   } catch (error) {
     throw error;

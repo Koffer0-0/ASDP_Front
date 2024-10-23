@@ -1,12 +1,10 @@
 
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_APP_API + 'Employees';
-
+import {API_EMPLOYEES_ENDPOINT} from "~/constants/consts";
 
 export const getEmployees = async () => {
   try {
-    const response = await axios.get(`${API_URL}`);
+    const response = await axios.get(`${API_EMPLOYEES_ENDPOINT}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -15,7 +13,7 @@ export const getEmployees = async () => {
 
 export const registerEmployee = async (employeeData: any) => {
   try {
-    const response = await axios.post(`${API_URL}`, employeeData);
+    const response = await axios.post(`${API_EMPLOYEES_ENDPOINT}`, employeeData);
     return response.data;
   } catch (error) {
     throw error;
@@ -24,7 +22,7 @@ export const registerEmployee = async (employeeData: any) => {
 
 export const getDirectors = async () => {
   try {
-    const response = await axios.get(`${API_URL}/directors`);
+    const response = await axios.get(`${API_EMPLOYEES_ENDPOINT}/directors`);
     return response.data;
   } catch (error) {
     throw error;
@@ -33,7 +31,7 @@ export const getDirectors = async () => {
 
 export const getPermissions = async () => {
   try {
-    const response = await axios.get(`${API_URL}/permissions`);
+    const response = await axios.get(`${API_EMPLOYEES_ENDPOINT}/permissions`);
     return response.data;
   } catch (error) {
     throw error;
@@ -42,7 +40,7 @@ export const getPermissions = async () => {
 
 export const getPositions = async () => {
   try {
-    const response = await axios.get(`${API_URL}/positions`);
+    const response = await axios.get(`${API_EMPLOYEES_ENDPOINT}/positions`);
     return response.data;
   } catch (error) {
     throw error;
@@ -51,7 +49,7 @@ export const getPositions = async () => {
 
 export const getTeamleaders = async () => {
   try {
-    const response = await axios.get(`${API_URL}/teamleaders`);
+    const response = await axios.get(`${API_EMPLOYEES_ENDPOINT}/teamleaders`);
     return response.data;
   } catch (error) {
     throw error;

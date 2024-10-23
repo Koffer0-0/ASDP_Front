@@ -1,11 +1,10 @@
 
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_APP_API;
+import {API_AUTHORIZE_ENDPOINT} from "~/constants/consts";
 
 export const getEmployeeByIin = async (iin: string) => {
   try {
-    const response = await axios.get(`${API_URL}Authorize/getEmployeeByIin?iin=${iin}`);
+    const response = await axios.get(`${API_AUTHORIZE_ENDPOINT}/getEmployeeByIin?iin=${iin}`);
     return response.data;
   } catch (error) {
     throw error;

@@ -1,11 +1,10 @@
 
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_APP_API + 'Sign';
+import {API_SIGN_ENDPOINT} from "~/constants/consts";
 
 export const getSignPipelines = async () => {
     try {
-        const response = await axios.get(`${API_URL}/createdSignPipelines`);
+        const response = await axios.get(`${API_SIGN_ENDPOINT}/createdSignPipelines`);
         return response.data;
     } catch (error) {
         throw error;
@@ -14,7 +13,7 @@ export const getSignPipelines = async () => {
 
 export const signDocument = async (templateData: FormData) => {
     try {
-        const response = await axios.post(`${API_URL}/signDocument`, templateData, {
+        const response = await axios.post(`${API_SIGN_ENDPOINT}/signDocument`, templateData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
         return response.data;
@@ -25,7 +24,7 @@ export const signDocument = async (templateData: FormData) => {
 
 export const registerSignPipeline = async (templateData: FormData) => {
     try {
-        const response = await axios.post(`${API_URL}/registerSignPipeline`, templateData, {
+        const response = await axios.post(`${API_SIGN_ENDPOINT}/registerSignPipeline`, templateData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
         return response.data;
@@ -36,7 +35,7 @@ export const registerSignPipeline = async (templateData: FormData) => {
 
 export const getDocumentsToSign = async () => {
     try {
-        const response = await axios.get(`${API_URL}/documentsToSign`);
+        const response = await axios.get(`${API_SIGN_ENDPOINT}/documentsToSign`);
         return response.data;
     } catch (error) {
         throw error;

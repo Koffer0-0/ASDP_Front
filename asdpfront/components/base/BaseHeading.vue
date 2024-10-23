@@ -10,7 +10,7 @@ defineProps({
 
 <template>
   <div class="flex gap-1 items-center ">
-    <h5 class="text-xl font-semibold dark:text-white">{{ text }}</h5>
+    <h5 class="text-2xl font-semibold dark:text-white">{{ text }}</h5>
   </div>
 </template>
 

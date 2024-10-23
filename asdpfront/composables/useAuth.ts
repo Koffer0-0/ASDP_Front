@@ -1,6 +1,6 @@
 
 import { ref } from 'vue';
-import { getEmployeeByIin } from "@/server/employeeApi";
+import { getEmployeeByIin } from "@/server/authApi";
 
 export function useAuth() {
   const user = ref(null);
@@ -8,7 +8,13 @@ export function useAuth() {
 
   const fetchEmployeeByIin = async (iin: string) => {
     try {
-      user.value = await getEmployeeByIin(iin);
+      const response = await getEmployeeByIin(iin);
+      if (response.status === 204) {
+        return null;
+      }
+      if (response.status === 200) {
+        user.value = response.data;
+      }
     } catch (err) {
       error.value = err.message;
     }

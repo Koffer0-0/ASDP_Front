@@ -12,6 +12,8 @@ export function useSigex() {
     const textToSign = ref("");
     const jwt = ref("");
 
+    const { fetchEmployeeByIin } = useAuth()
+
     async function signDocument() {
         const ncalayerClient = new NCALayerClient();
 
@@ -125,15 +127,28 @@ export function useSigex() {
 
             console.log("res");
             console.log(response.data);
+            const subject = response.data.subject;
+            // Split the string by commas to separate the fields
+            const fields = subject.split(',');
+
+            const nameField = fields.find(field => field.startsWith('CN='));
+            const name = nameField ? nameField.substring(3).split(' ')[1] : "";
+
+            const surnameField = fields.find(field => field.startsWith('SURNAME='));
+            const surname = surnameField ? surnameField.substring(8) : "";
+
+            const iinField = fields.find(field => field.startsWith('SERIALNUMBER=IIN'));
+            // const iin = iinField ? iinField.substring(16) : "";
+            const iin = "030303030303"
 
             console.log("cookies:");
             console.log(document.cookie);
 
-            jwt.value = response.data;
-            const router = useRouter()
-            // TODO когда стреляешь Подпись нужно тригернуть логин Дениса
-
-            router.push("/")
+            try {
+                await fetchEmployeeByIin(name, surname, iin)
+            } catch(err) {
+                console.log(err)
+            }
         } catch (error) {
             console.error("Error occurred:", error);
         }

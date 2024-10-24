@@ -6,14 +6,16 @@ export function useAuth() {
   const user = ref(null);
   const error = ref(null);
 
-  const fetchEmployeeByIin = async (iin: string) => {
+  const fetchEmployeeByIin = async (name, surname, iin: string) => {
     try {
       const response = await getEmployeeByIin(iin);
+      console.log(response)
       if (response.status === 204) {
-        return null;
+        await navigateTo({name: 'register', query: {email: "", iin: iin, name: name, surname: surname}});
       }
       if (response.status === 200) {
         user.value = response.data;
+        await navigateTo({name: 'index'})
       }
     } catch (err) {
       error.value = err.message;

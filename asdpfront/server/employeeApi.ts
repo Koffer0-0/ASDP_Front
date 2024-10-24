@@ -14,7 +14,7 @@ export const getEmployees = async () => {
 export const registerEmployee = async (employeeData: any) => {
   try {
     const response = await axios.post(`${API_EMPLOYEES_ENDPOINT}`, employeeData);
-    return response.data;
+    return response;
   } catch (error) {
     throw error;
   }

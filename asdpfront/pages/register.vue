@@ -14,9 +14,10 @@ const form = ref({
   iin: "",
   identityNumber: "",
   identityIssuer: "",
-  identityIssueDate: ""
+  positionCode: 1,
 });
 
+const identityIssueDate = ref("")
 const { addEmployee } = useEmployee();
 const route = useRoute();
 
@@ -32,7 +33,10 @@ const populateFormFromQuery = () => {
 
 const registerUser = async () => {
   try {
-    const payload = { ...form.value };
+    const date = new Date(identityIssueDate.value);
+    const identityIssueDateISO = date.toISOString();
+
+    const payload = { ...form.value, identityIssueDate: identityIssueDateISO };
     await addEmployee(payload);
     alert("Employee added successfully!");
   } catch (error) {
@@ -74,13 +78,13 @@ onMounted(() => {
         <!-- IIN Field -->
         <div>
           <label for="iin" class="block my-1 text-sm font-medium text-gray-700">ИИН</label>
-          <input v-model="form.iin" type="number" class="w-full rounded-lg border-gray-200 bg-gray-200 p-2 text-sm shadow-sm" placeholder="Enter IIN" />
+          <input v-model="form.iin" minlength="12" maxlength="12" type="text" class="w-full rounded-lg border-gray-200 bg-gray-200 p-2 text-sm shadow-sm" placeholder="Enter IIN" />
         </div>
 
         <!-- Identity Number Field -->
         <div>
           <label for="identityNumber" class="block my-1 text-sm font-medium text-gray-700">№ Документа</label>
-          <input v-model="form.identityNumber" type="number" class="w-full rounded-lg border-gray-200 bg-gray-200 p-2 text-sm shadow-sm" placeholder="Enter document number" />
+          <input v-model="form.identityNumber" minlength="9" maxlength="9" type="text" class="w-full rounded-lg border-gray-200 bg-gray-200 p-2 text-sm shadow-sm" placeholder="Enter document number" />
         </div>
 
         <!-- Issuer Field -->
@@ -92,7 +96,7 @@ onMounted(() => {
         <!-- Issue Date Field -->
         <div>
           <label for="identityIssueDate" class="block my-1 text-sm font-medium text-gray-700">Дата выдачи</label>
-          <input v-model="form.identityIssueDate" type="date" class="w-full rounded-lg border-gray-200 bg-gray-200 p-2 text-sm shadow-sm" placeholder="Enter issue date" />
+          <input v-model="identityIssueDate" type="date" class="w-full rounded-lg border-gray-200 bg-gray-200 p-2 text-sm shadow-sm" placeholder="Enter issue date" />
         </div>
 
         <!-- Submit Button -->

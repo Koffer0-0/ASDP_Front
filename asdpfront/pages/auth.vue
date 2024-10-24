@@ -8,7 +8,7 @@ definePageMeta({
 const { auth } = useSigex()
 
 const triggerSigexLogin = async () => {
-  await navigateTo({ name: 'register', query: { email: "test@example.com", iin: "123456789", name: "John", surname: "Doe" } });
+  auth()
 }
 
 </script>

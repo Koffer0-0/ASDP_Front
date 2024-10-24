@@ -59,8 +59,10 @@ export function useEmployee() {
 
   const addEmployee = async (newEmployee: any) => {
     try {
-      await registerEmployee(newEmployee);
-      await fetchEmployees();
+      const response = await registerEmployee(newEmployee);
+      if (response.status === 200) {
+        await navigateTo({name: 'index'})
+      }
     } catch (err) {
       error.value = err.message;
     }

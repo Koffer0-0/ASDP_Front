@@ -30,9 +30,20 @@ const items = [
   },
 ]
 
-const toggleActions = (id) => {
-
+const startProcess = (id) => {
+  console.log("Gay")
+  closeModal()
 }
+
+const isModalOpen = ref(false);
+
+const openModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+};
 </script>
 
 <template>
@@ -69,6 +80,11 @@ const toggleActions = (id) => {
     </div>
 
     <div class="relative overflow-x-auto">
+      <ContentHeader title="Мои документы">
+        <template #button>
+          <BaseButton text="Запустить процесс" @click="openModal"/>
+        </template>
+      </ContentHeader>
       <BaseTable :items="items" :labels="labels">
         <template #actions="{item}">
           <button @click="toggleActions(item.id)" class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white">
@@ -81,7 +97,24 @@ const toggleActions = (id) => {
       </BaseTable>
     </div>
   </section>
+  <div v-if="isModalOpen" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white w-1/3 rounded-lg shadow-lg p-6">
+      <!-- Заголовок модального окна -->
+      <h2 class="text-lg font-bold mb-4">Форма</h2>
+      <form @submit.prevent="startProcess">
+        <div class="mb-4">
+          <label for="identityIssueDate" class="block text-sm font-medium text-gray-700">Дата выдачи</label>
+          <input type="date" id="identityIssueDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+        </div>
 
+        <!-- Кнопки -->
+        <div class="flex justify-end space-x-4">
+          <button type="button" @click="closeModal" class="px-4 py-2 bg-gray-400 text-white rounded-lg">Закрыть</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Отправить</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <style scoped>

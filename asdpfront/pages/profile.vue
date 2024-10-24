@@ -1,10 +1,37 @@
 <script setup lang="ts">
-const firstName = ref('');
-const lastName = ref('');
-const email = ref('');
-const iin = ref('');
-const documentNumber = ref('');
-const issueDate = ref('');
+import {ref} from "vue";
+
+const form = ref({
+  mail: "",
+  name: "",
+  surName: "",
+  iin: "",
+  identityNumber: "",
+  identityIssuer: "",
+  identityIssueDate: "",
+  positionId: 1,
+});
+
+const userStore = useUserStore();
+
+onMounted(() => {
+  const user = userStore.user
+  form.value = {...user}
+})
+
+const positionName = computed(() => {
+  switch (form.value.positionId) {
+    case 1:
+      return 'Сотрудник';
+    case 2:
+      return 'Тимлид';
+    case 3:
+      return 'Директор';
+    default:
+      return 'Неизвестная позиция'; // Если введено что-то другое
+  }
+});
+
 </script>
 
 <template>
@@ -18,60 +45,79 @@ const issueDate = ref('');
 <!--      </a>-->
 <!--    </div>-->
     <form action="#">
+      <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <strong>Позиция:</strong> {{ positionName }}
+      </label>
+
       <div class="grid gap-10 mb-4 sm:grid-cols-2 px-40 justify-center">
         <BaseInput
-          label="Имя"
-          name="first_name"
-          id="first_name"
-          v-model:value="firstName"
-          placeholder="Arman"
-      />
+            :disabled="true"
+            label="Имя"
+            name="first_name"
+            id="first_name"
+            v-model:value="form.name"
+            placeholder="Arman"
+        />
 
         <BaseInput
+            :disabled="true"
             label="Фамилия"
             name="last_name"
             id="last_name"
-            v-model:value="lastName"
+            v-model:value="form.surName"
             placeholder="Armankulov"
         />
 
         <BaseInput
+            :disabled="true"
             label="Email"
             type="email"
             name="email"
             id="email"
-            v-model:value="email"
+            v-model:value="form.mail"
             placeholder="arman@gmail.com"
         />
 
         <BaseInput
+            :disabled="true"
             label="ИИН"
             type="number"
             name="iin"
             id="iin"
-            v-model:value="iin"
+            v-model:value="form.iin"
             placeholder="777777777"
         />
 
         <BaseInput
+            :disabled="true"
             label="№ Документа"
             type="number"
             name="document_number"
             id="document_number"
-            v-model:value="documentNumber"
+            v-model:value=form.identityNumber
             placeholder="10/10/2024"
         />
-
         <BaseInput
+            :disabled="true"
             label="Дата Выдачи"
             type="date"
             name="issue_date"
             id="issue_date"
-            v-model:value="issueDate"
+            v-model:value="form.identityIssueDate"
             placeholder="10/10/2024"
-        /></div>
+        />
+        <BaseInput
+            :disabled="true"
+            label="Орган Выдачи"
+            type="text"
+            name="issuer"
+            id="issuer"
+            v-model:value="form.identityIssuer"
+            placeholder="10/10/2024"
+        />
+      </div>
       <div class="flex items-center space-x-4 my-10 justify-center">
-        <BaseButton text="Сохранить Изменения"/>
+<!--        <BaseButton text="Сохранить Изменения"/>-->
       </div>
     </form>
   </div>

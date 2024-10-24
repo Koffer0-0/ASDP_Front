@@ -10,10 +10,12 @@ export function useAuth() {
     try {
       const response = await getEmployeeByIin(iin);
       console.log(response)
+      const userStore = useUserStore()
       if (response.status === 204) {
         await navigateTo({name: 'register', query: {email: "", iin: iin, name: name, surname: surname}});
       }
       if (response.status === 200) {
+        userStore.saveUser(response.data)
         user.value = response.data;
         await navigateTo({name: 'index'})
       }

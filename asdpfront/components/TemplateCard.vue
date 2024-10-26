@@ -19,10 +19,10 @@ defineProps({
       </a>
 <!--      <p class="mb-3 text-sm font-normal text-gray-700 dark:text-gray-400">Описание Шаблона</p>-->
      <div class="flex gap-2">
-       <button @click=""
-               class="px-5 py-2 font-medium text-center text-gray-500 border-2 border-gray-400 rounded-md hover:text-gray-800 hover:border-gray-800 focus:ring-4 focus:outline-none ">
-         Использовать
-       </button>
+<!--       <button @click=""-->
+<!--               class="px-5 py-2 font-medium text-center text-gray-500 border-2 border-gray-400 rounded-md hover:text-gray-800 hover:border-gray-800 focus:ring-4 focus:outline-none ">-->
+<!--         Использовать-->
+<!--       </button>-->
        <a :href="`${API_DOCUMENTS_ENDPOINT}/getTemplate/${template.id}`"
           target="_blank"
                class="px-5 py-2 font-medium text-center text-gray-500 border-2 border-gray-400 rounded-md hover:text-gray-800 hover:border-gray-800 focus:ring-4 focus:outline-none ">

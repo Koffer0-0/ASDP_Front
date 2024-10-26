@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import {ref} from "vue";
+import IconEyeClosed from "~/components/icons/IconEyeClosed.vue";
+import IconEyeOpen from "~/components/icons/IconEyeOpen.vue";
 
 const form = ref({
   mail: "",
@@ -11,6 +13,9 @@ const form = ref({
   identityIssueDate: "",
   positionId: 1,
 });
+const showIin = ref(false);
+const showIdentityNumber = ref(false);
+const showIssueDate = ref(false);
 
 const userStore = useUserStore();
 
@@ -32,6 +37,19 @@ const positionName = computed(() => {
   }
 });
 
+const formattedDate = computed({
+  get() {
+    if (!form.value.identityIssueDate) return '';
+    const date = new Date(form.value.identityIssueDate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  },
+  set(newValue) {
+    // Optional: Parse the input back to the original format if needed
+  }
+});
 </script>
 
 <template>
@@ -81,31 +99,55 @@ const positionName = computed(() => {
         <BaseInput
             :disabled="true"
             label="ИИН"
-            type="number"
+            :type="showIin ? 'text' : 'password'"
             name="iin"
             id="iin"
             v-model:value="form.iin"
             placeholder="777777777"
-        />
+        >
+          <span
+              class="absolute end-0 top-10 right-5"
+              @click="showIin = !showIin"
+          >
+                  <IconEyeClosed v-if="!showIin"/>
+                  <IconEyeOpen v-if="showIin"/>
+          </span>
+        </BaseInput>
 
         <BaseInput
             :disabled="true"
             label="№ Документа"
-            type="number"
+            :type="showIdentityNumber ? 'text' : 'password'"
             name="document_number"
             id="document_number"
             v-model:value=form.identityNumber
             placeholder="10/10/2024"
-        />
+        >
+          <span
+              class="absolute end-0 top-10 right-5"
+              @click="showIdentityNumber = !showIdentityNumber"
+          >
+                  <IconEyeClosed v-if="!showIdentityNumber"/>
+                  <IconEyeOpen v-if="showIdentityNumber"/>
+          </span>
+        </BaseInput>
         <BaseInput
             :disabled="true"
             label="Дата Выдачи"
-            type="date"
+            :type="showIssueDate ? 'text' : 'password'"
             name="issue_date"
             id="issue_date"
-            v-model:value="form.identityIssueDate"
+            v-model:value="formattedDate"
             placeholder="10/10/2024"
-        />
+        >
+          <span
+              class="absolute end-0 top-10 right-5"
+              @click="showIssueDate = !showIssueDate"
+          >
+                  <IconEyeClosed v-if="!showIssueDate"/>
+                  <IconEyeOpen v-if="showIssueDate"/>
+          </span>
+        </BaseInput>
         <BaseInput
             :disabled="true"
             label="Орган Выдачи"

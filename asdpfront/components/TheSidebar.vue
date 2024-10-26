@@ -5,6 +5,7 @@ import IconDocument from "~/components/icons/IconDocument.vue";
 import IconStructure from "~/components/icons/IconStructure.vue";
 import IconSettings from "~/components/icons/IconSettings.vue";
 import IconTurn from "~/components/icons/IconTurn.vue";
+import IconUser from "~/components/icons/IconUser.vue";
 
 const firstList = [
   {icon: IconHome, link: "/", name: "Моя Консоль"},
@@ -13,7 +14,7 @@ const firstList = [
 ]
 
 const secondList = [
-  {icon: IconStructure, link: "/structure", name: "Структура"},
+  {icon: IconUser, link: "/structure", name: "Структура"},
 ]
 
 const bottomList = [

@@ -44,7 +44,7 @@ import IconNotification from "~/components/icons/IconNotification.vue";
             <span class="sr-only">Toggle sidebar</span>
           </button>
           <a href="/" class="flex items-center justify-between mr-4">
-            Logo
+            <img src="/logo.png" alt="Logo" height="30" class="max-h-10"/>
           </a>
           <BaseSearch/>
         </div>

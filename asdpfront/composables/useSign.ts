@@ -33,7 +33,7 @@ export function useSign() {
 
   const registerPipeline = async (UserId, GeneratedDocument, TeamleadId, DirectorId, SigexDocumentId, SigexSignId) => {
     try {
-      await registerSignPipeline(UserId, GeneratedDocument, TeamleadId, DirectorId, SigexDocumentId, SigexSignId);
+      return await registerSignPipeline(UserId, GeneratedDocument, TeamleadId, DirectorId, SigexDocumentId, SigexSignId);
     } catch (err) {
       error.value = err.message;
     }

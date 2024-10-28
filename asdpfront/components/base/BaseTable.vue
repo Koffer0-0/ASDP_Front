@@ -11,6 +11,21 @@ const props = defineProps({
     required: true,
   },
 });
+
+function statusClass(statusCode) {
+  switch (statusCode) {
+    case 1:
+      return 'bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-900 dark:text-gray-300';
+    case 2:
+      return 'bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300';
+    case 3:
+      return 'bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300';
+    case 4:
+      return 'bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300';
+    default:
+      return 'bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-red-700 dark:text-red-300';
+  }
+}
 </script>
 
 <template>
@@ -36,11 +51,13 @@ const props = defineProps({
     <tr v-for="item in items" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
       <!-- Dynamically render each cell based on the label's key -->
       <td v-for="label in labels" :key="label.key" class="whitespace-nowrap p-4 text-sm font-medium">
-        {{ item[label.key] }}
+          <span v-if="label.key === 'status'">
+            <span :class="statusClass(item.statusCode)">{{ item[label.key] }}</span>
+          </span>
+        <span v-else>{{ item[label.key] }}</span>
       </td>
       <td class="p-4 text-right">
-        <slot name="actions" :item="item">
-        </slot>
+        <slot name="actions" :item="item"></slot>
       </td>
     </tr>
     </tbody>

@@ -38,7 +38,7 @@ export const registerSignPipeline = async (UserId, GeneratedDocument, TeamleadId
             headers: { 'Content-Type': 'multipart/form-data' },
         });
 
-        return response.data;
+        return response;
     } catch (error) {
         throw error;
     }

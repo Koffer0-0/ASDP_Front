@@ -4,38 +4,22 @@ import BaseTable from "~/components/base/BaseTable.vue";
 
 const labels = [
   { key: 'id', text: 'ID', sortable: false },
-  { key: 'doc_name', text: 'Название Документа', sortable: true },
-  { key: 'whom', text: 'От кого', sortable: true },
-  { key: 'dueDate', text: 'Время', sortable: true },
-  { key: 'status', text: 'Status', sortable: true },
+  { key: 'mail', text: 'Почта', sortable: false },
+  { key: 'name', text: 'Имя', sortable: false },
+  { key: 'surName', text: 'Фамилия', sortable: false },
+  { key: 'iin', text: 'ИИН', sortable: false },
 ]
 
-const items = [
-  {
-    id: '#FWB127364372',
-    dueDate: '09 Jan 2024',
-    whom: 'Денис Одноуров',
-    doc_name: 'Договор от 12 окт',
-    statusClass: 'bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-300',
-    statusText: 'Ongoing',
-    statusIcon: 'M18.5 4h-13m13 16h-13M8 20v-3.333a2 2 0 0 1 .4-1.2L10 12.6a1 1 0 0 0 0-1.2L8.4 8.533a2 2 0 0 1-.4-1.2V4h8v3.333a2 2 0 0 1-.4 1.2L13.957 11.4a1 1 0 0 0 0 1.2l1.643 2.867a2 2 0 0 1 .4 1.2V20H8Z',
-  },
-  {
-    id: '#FWB125467980',
-    dueDate: '12 Dec 2023',
-    whom: 'Аружан Аманова',
-    doc_name: 'Договор от 12 окт',
-    statusClass: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-    statusText: 'Denied',
-    statusIcon: 'M6 18 17.94 6M18 18 6.06 6',
-  },
-]
+const {fetchEmployees, employees} = useEmployee()
 
+onMounted(() => {
+  fetchEmployees()
+})
 </script>
 
 <template>
   <ContentHeader title="Структура"/>
-  <BaseTable :items="items" :labels="labels">
+  <BaseTable :items="employees" :labels="labels">
     <!--        <template #actions="{item}">-->
     <!--          <button @click="toggleActions(item.id)" class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white">-->
     <!--            <span class="sr-only"> Actions </span>-->

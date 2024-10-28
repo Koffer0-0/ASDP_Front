@@ -16,29 +16,26 @@ export function useDocument() {
     }
   };
 
-  const fetchDocument = async (documentId: string) => {
+  const fetchDocument = async (docName, documentId: string) => {
     try {
-      document.value = await getDocument(documentId);
+      const response = await getDocument(documentId);
+      const blob = response.data;
+
+      const fileData = new File([blob], docName, { type: blob.type });
+
+      console.log('File downloaded successfully:', fileData);
+      return fileData;
     } catch (err) {
       error.value = err.message;
     }
   };
 
-  const fetchTemplate = async (templateId: string) => {
+  const fetchTemplate = async (templateName, templateId: string) => {
     try {
       const response =  await getTemplate(templateId);
       const blob = response.data;
-      const contentDisposition = response.headers['content-disposition'];
-      let filename = 'downloaded_file';
 
-      if (contentDisposition) {
-        // Ищем имя файла в заголовке
-        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
-        if (filenameMatch.length > 1) {
-          filename = filenameMatch[1];
-        }
-      }
-      const fileData = new File([blob], filename, { type: blob.type });
+      const fileData = new File([blob], templateName, { type: blob.type });
 
       console.log('File downloaded successfully:', fileData);
       return fileData;

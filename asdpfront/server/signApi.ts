@@ -11,11 +11,9 @@ export const getSignPipelines = async (userId) => {
     }
 };
 
-export const signDocument = async (templateData: FormData) => {
+export const signDocument = async (payload) => {
     try {
-        const response = await axios.post(`${API_SIGN_ENDPOINT}/signDocument`, templateData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        const response = await axios.post(`${API_SIGN_ENDPOINT}/signDocument`, payload);
         return response.data;
     } catch (error) {
         throw error;
@@ -44,9 +42,9 @@ export const registerSignPipeline = async (UserId, GeneratedDocument, TeamleadId
     }
 };
 
-export const getDocumentsToSign = async () => {
+export const getDocumentsToSign = async (userId) => {
     try {
-        const response = await axios.get(`${API_SIGN_ENDPOINT}/documentsToSign`);
+        const response = await axios.get(`${API_SIGN_ENDPOINT}/documentsToSign?userId=${userId}`);
         return response.data;
     } catch (error) {
         throw error;

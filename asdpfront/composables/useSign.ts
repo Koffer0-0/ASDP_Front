@@ -15,17 +15,17 @@ export function useSign() {
     }
   };
 
-  const fetchDocumentsToSign = async () => {
+  const fetchDocumentsToSign = async (userId) => {
     try {
-      documents.value = await getDocumentsToSign();
+      documents.value = await getDocumentsToSign(userId);
     } catch (err) {
       error.value = err.message;
     }
   };
 
-  const handleSignDocument = async (newTemplate: FormData) => {
+  const handleSignDocument = async (payload) => {
     try {
-      await signDocument(newTemplate);
+      return await signDocument(payload);
     } catch (err) {
       error.value = err.message;
     }

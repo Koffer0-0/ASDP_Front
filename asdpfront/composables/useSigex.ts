@@ -2,6 +2,7 @@ import { NCALayerClient } from "ncalayer-js-client";
 import { ref } from "vue";
 import axios from "axios"; // Use axios for HTTP requests
 
+const IIN_CONST = "030303030303" //Employee IIN
 export function useSigex() {
     const domenFull = ref("https://sigex.kz");
     const domen = "sigex.kz";
@@ -139,7 +140,7 @@ export function useSigex() {
 
             const iinField = fields.find(field => field.startsWith('SERIALNUMBER=IIN'));
             // const iin = iinField ? iinField.substring(16) : "";
-            const iin = "030303030303"
+            const iin = IIN_CONST
 
             console.log("cookies:");
             console.log(document.cookie);
@@ -208,10 +209,38 @@ export function useSigex() {
         }
     }
 
+    async function addSignToDocument(file, iin, id) {
+        const signature = await signDocument(file)
+
+        try {
+            const fileSize = file.size;
+
+            const response = await axios.post(`${domenFull.value}/api/${id}/buildDDC`, file, {
+                headers: {
+                    'Content-Type': 'application/octet-stream',
+                    'Content-Length': fileSize,
+                },
+                params: {
+                    signature: signature,
+                    settings: JSON.stringify({
+                        signersRequirements: [
+                            {iin: `IIN${iin}`}
+                        ]
+                    })
+                },
+            });
+
+            return response
+            console.log("Register response:", response.data);
+        } catch (error) {
+            console.error("Error occurred:", error);
+        }
+    }
 
     return {
         auth,
         registerDocument,
         documentFixation,
+        addSignToDocument
     };
 }

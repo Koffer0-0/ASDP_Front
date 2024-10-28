@@ -11,9 +11,9 @@ const cardLinks = [
 
 const labels = [
   { key: 'signPipelineId', text: 'ID', sortable: false },
-  { key: 'name', text: 'Название Документа', sortable: true },
-  { key: 'createdDate', text: 'Время', sortable: true },
-  { key: 'status', text: 'Status', sortable: true },
+  { key: 'name', text: 'Название Документа', sortable: false },
+  { key: 'createdDate', text: 'Время', sortable: false },
+  { key: 'status', text: 'Статус', sortable: false },
 ]
 
 const items = [
@@ -43,9 +43,9 @@ const data = ref({
   teamlidId: "",
 })
 
-const {fetchTemplates, templates, handleGenerateDocument, fetchTemplate, } = useDocument()
+const {fetchTemplates, templates, handleGenerateDocument, fetchDocument} = useDocument()
 const {fetchDocumentsToSign, fetchPipelines, handleSignDocument, documents, pipelines, registerPipeline} = useSign()
-const {registerDocument, documentFixation} = useSigex()
+const {registerDocument, documentFixation, addSignToDocument} = useSigex()
 const {
   directors,
   teamleaders,
@@ -57,7 +57,7 @@ const userStore = useUserStore()
 
 onMounted(() => {
   fetchPipelines(userStore.user.id)
-  fetchDocumentsToSign()
+  fetchDocumentsToSign(userStore.user.id)
 })
 
 function findTemplateNameById(templateId) {
@@ -75,7 +75,6 @@ const startProcess = async () => {
     teamlidId: data.value.teamlidId,
   }
   const templateName = findTemplateNameById(data.value.templateId);
-  console.log(templateName)
   const generatedDocument = await handleGenerateDocument(payload, templateName)
   const {documentId, signId} = await registerDocument(generatedDocument, userStore.user.iin)
   await documentFixation(generatedDocument, userStore.user.iin, documentId)
@@ -96,6 +95,36 @@ const openModal = async () => {
 const closeModal = () => {
   isModalOpen.value = false;
 };
+
+const downloadDoc = () => {
+  isModalOpen.value = false;
+};
+
+const rejectDoc = async (item) => {
+  const payload = {
+    signPipelineId: item.signPipelineId,
+    creatorUserId: userStore.user.id,
+    isSign: false
+  }
+  await handleSignDocument(payload)
+  await fetchDocumentsToSign(userStore.user.id)
+  await fetchPipelines(userStore.user.id)
+}
+
+const signDoc = async (item) => {
+  const payload = {
+    signPipelineId: item.signPipelineId,
+    creatorUserId: userStore.user.id,
+    isSign: true
+  }
+  const doc = await fetchDocument(item.name, item.documentId)
+  await addSignToDocument(doc, userStore.user.iin, item.sigexDocumentId)
+  const response = await handleSignDocument(payload)
+  if (response.IsSuccess) {
+    await fetchDocumentsToSign(userStore.user.id)
+    await fetchPipelines(userStore.user.id)
+  }
+}
 </script>
 
 <template>
@@ -111,23 +140,38 @@ const closeModal = () => {
       </a>
     </div>
 
-    <div class="">
+    <div class="" v-if="userStore.user?.positionId !== 3">
       <ContentHeader title="Мои документы">
         <template #button>
           <BaseButton text="Запустить процесс" @click="openModal"/>
         </template>
       </ContentHeader>
-      {{documents}} {{pipelines}}
-      <BaseTable :items="pipelines" :labels="labels">
-        <template #actions="{item}">
-          <button @click="toggleActions(item.id)" class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white">
-            <span class="sr-only"> Actions </span>
-            <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-              <path stroke="currentColor" stroke-linecap="round" stroke-width="4" d="M6 12h.01m6 0h.01m5.99 0h.01"/>
+      <BaseTable :items="pipelines" :labels="labels" v-if="pipelines.length > 0">
+        <template #actions="{item}" >
+          <button v-if="item.statusCode === 4" @click="downloadDoc(item.id)" class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white">
+            <svg class="w-5 h-5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V4M7 14H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2m-1-5-4 5-4-5m9 8h.01"/>
             </svg>
           </button>
         </template>
       </BaseTable>
+      <div v-else class="no-data flex items-center justify-center text-gray-500 dark:text-gray-400 h-32">
+        <p>На данный момент нету документов</p>
+      </div>
+    </div>
+    <div class="" v-if="userStore.user?.positionId !== 1">
+      <ContentHeader title="Документы на Подписания"/>
+      <BaseTable :items="documents" :labels="labels" v-if="documents.length > 0">
+        <template #actions="{item}">
+          <div class="flex gap-1 w-1/2">
+            <BaseButton text="Подписать" @click="signDoc(item)" class="bg-primary-500 hover:bg-primary-600"/>
+            <BaseButton text="Отклонить" @click="rejectDoc(item)" class="bg-red-500 hover:bg-red-600"/>
+          </div>
+        </template>
+      </BaseTable>
+      <div v-else class="no-data flex items-center justify-center text-gray-500 dark:text-gray-400 h-32">
+        <p>На данный момент нету документов для подписания</p>
+      </div>
     </div>
   </section>
   <div v-if="isModalOpen" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">

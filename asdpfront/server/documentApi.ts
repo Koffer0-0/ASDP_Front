@@ -36,8 +36,10 @@ export const generateDocument = async (data) => {
 
 export const getDocument = async (documentId: string) => {
   try {
-    const response = await axios.get(`${API_DOCUMENTS_ENDPOINT}/getDocument/${documentId}`);
-    return response.data;
+    const response = await axios.get(`${API_DOCUMENTS_ENDPOINT}/getDocument/${documentId}`, {
+      responseType: 'blob',
+    });
+    return response;
   } catch (error) {
     throw error;
   }

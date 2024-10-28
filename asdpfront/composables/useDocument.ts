@@ -28,7 +28,17 @@ export function useDocument() {
     try {
       const response =  await getTemplate(templateId);
       const blob = response.data;
-      const fileData = new File([blob], 'template.docx', { type: blob.type });
+      const contentDisposition = response.headers['content-disposition'];
+      let filename = 'downloaded_file';
+
+      if (contentDisposition) {
+        // Ищем имя файла в заголовке
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (filenameMatch.length > 1) {
+          filename = filenameMatch[1];
+        }
+      }
+      const fileData = new File([blob], filename, { type: blob.type });
 
       console.log('File downloaded successfully:', fileData);
       return fileData;
@@ -46,11 +56,22 @@ export function useDocument() {
     }
   };
 
-  const handleGenerateDocument = async (data) => {
+  const handleGenerateDocument = async (data, filename) => {
     try {
       const response = await generateDocument(data);
+      console.log(response)
       const blob = response.data;
-      const fileData = new File([blob], 'template.docx', { type: blob.type });
+      // const contentDisposition = response.headers['content-disposition'];
+      //
+      // if (contentDisposition) {
+      //   // Ищем имя файла в заголовке
+      //   const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+      //   if (filenameMatch.length > 1) {
+      //     filename = filenameMatch[1];
+      //   }
+      // }
+
+      const fileData = new File([blob], filename, { type: blob.type });
 
       console.log('File downloaded successfully:', fileData);
       return fileData;

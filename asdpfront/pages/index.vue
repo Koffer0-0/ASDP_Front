@@ -56,12 +56,16 @@ const {
 const userStore = useUserStore()
 
 onMounted(() => {
-  fetchDirectors()
-  fetchTeamleaders()
-  fetchTemplates()
   fetchPipelines(userStore.user.id)
   fetchDocumentsToSign()
 })
+
+function findTemplateNameById(templateId) {
+  const template = templates.value.find(item => item.id === templateId);
+  return template ? template.name : null; // Вернем name, если найдено, иначе null
+}
+
+// Использование функции
 
 const startProcess = async () => {
   const payload = {
@@ -70,16 +74,23 @@ const startProcess = async () => {
     directorId: data.value.directorId,
     teamlidId: data.value.teamlidId,
   }
-  const generatedDocument = await handleGenerateDocument(payload)
+  const templateName = findTemplateNameById(data.value.templateId);
+  console.log(templateName)
+  const generatedDocument = await handleGenerateDocument(payload, templateName)
   const {documentId, signId} = await registerDocument(generatedDocument, userStore.user.iin)
   await documentFixation(generatedDocument, userStore.user.iin, documentId)
-  await registerPipeline(userStore.user.id, generatedDocument, data.value.teamlidId, data.value.directorId, documentId, signId)
+  const response = await registerPipeline(userStore.user.id, generatedDocument, data.value.teamlidId, data.value.directorId, documentId, signId)
+  closeModal()
+  await fetchPipelines(userStore.user.id)
 }
 
 const isModalOpen = ref(false);
 
-const openModal = () => {
+const openModal = async () => {
   isModalOpen.value = true;
+  await fetchDirectors()
+  await fetchTeamleaders()
+  await fetchTemplates()
 };
 
 const closeModal = () => {
@@ -100,7 +111,7 @@ const closeModal = () => {
       </a>
     </div>
 
-    <div class="relative overflow-x-auto">
+    <div class="">
       <ContentHeader title="Мои документы">
         <template #button>
           <BaseButton text="Запустить процесс" @click="openModal"/>

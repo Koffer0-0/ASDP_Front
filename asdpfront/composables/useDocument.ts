@@ -1,6 +1,6 @@
 
 import { ref } from 'vue';
-import {loadTemplates, addTemplate, getDocument, getTemplate} from '@/server/documentApi';
+import {loadTemplates, addTemplate, getDocument, getTemplate, generateDocument} from '@/server/documentApi';
 
 export function useDocument() {
   const templates = ref([]);
@@ -26,7 +26,12 @@ export function useDocument() {
 
   const fetchTemplate = async (templateId: string) => {
     try {
-      template.value = await getTemplate(templateId);
+      const response =  await getTemplate(templateId);
+      const blob = response.data;
+      const fileData = new File([blob], 'template.docx', { type: blob.type });
+
+      console.log('File downloaded successfully:', fileData);
+      return fileData;
     } catch (err) {
       error.value = err.message;
     }
@@ -41,6 +46,19 @@ export function useDocument() {
     }
   };
 
+  const handleGenerateDocument = async (data) => {
+    try {
+      const response = await generateDocument(data);
+      const blob = response.data;
+      const fileData = new File([blob], 'template.docx', { type: blob.type });
+
+      console.log('File downloaded successfully:', fileData);
+      return fileData;
+    } catch (err) {
+      error.value = err.message;
+    }
+  };
+
   return {
     templates,
     document,
@@ -49,6 +67,7 @@ export function useDocument() {
     fetchTemplates,
     fetchDocument,
     fetchTemplate,
-    createTemplate
+    createTemplate,
+    handleGenerateDocument
   };
 }

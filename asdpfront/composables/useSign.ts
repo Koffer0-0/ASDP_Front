@@ -7,9 +7,9 @@ export function useSign() {
   const pipelines = ref([]);
   const error = ref(null);
 
-  const fetchPipelines = async () => {
+  const fetchPipelines = async (userId) => {
     try {
-      pipelines.value = await getSignPipelines();
+      pipelines.value = await getSignPipelines(userId);
     } catch (err) {
       error.value = err.message;
     }
@@ -31,9 +31,9 @@ export function useSign() {
     }
   };
 
-  const registerPipeline = async (newTemplate: FormData) => {
+  const registerPipeline = async (UserId, GeneratedDocument, TeamleadId, DirectorId, SigexDocumentId, SigexSignId) => {
     try {
-      await registerSignPipeline(newTemplate);
+      await registerSignPipeline(UserId, GeneratedDocument, TeamleadId, DirectorId, SigexDocumentId, SigexSignId);
     } catch (err) {
       error.value = err.message;
     }

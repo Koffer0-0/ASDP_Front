@@ -6,7 +6,6 @@ export function useSigex() {
     const domenFull = ref("https://sigex.kz");
     const domen = "sigex.kz";
     const title = ref('nca_tests');
-    const file = ref(null);
     const documentSign = ref("");
     const textSign = ref("");
     const textToSign = ref("");
@@ -14,7 +13,7 @@ export function useSigex() {
 
     const { fetchEmployeeByIin } = useAuth()
 
-    async function signDocument() {
+    async function signDocument(file) {
         const ncalayerClient = new NCALayerClient();
 
         try {
@@ -41,9 +40,10 @@ export function useSigex() {
         console.log(storageType);
         let base64EncodedSignature;
         try {
-            base64EncodedSignature = await ncalayerClient.createCAdESFromBase64(storageType, file.value);
+            base64EncodedSignature = await ncalayerClient.createCAdESFromBase64(storageType, file);
             console.log("base64EncodedSignature");
             console.log(base64EncodedSignature);
+            documentSign.value = base64EncodedSignature
         } catch (error) {
             window.alert(error.toString());
             console.log(error.toString());
@@ -154,15 +154,15 @@ export function useSigex() {
         }
     }
 
-    async function registerDocument() {
+    async function registerDocument(response, iin) {
+        const signature = await signDocument(response)
         try {
             const response = await axios.post(`${domenFull.value}/api`, {
-                title: "test",
-                signature: documentSign.value,
+                signature: signature,
                 settings: {
                     signersRequirements: [
                         {
-                            iin: "IIN011226550429",
+                            iin: `IIN${iin}`,
                         }
                     ]
                 }
@@ -174,14 +174,44 @@ export function useSigex() {
 
             console.log("register response");
             console.log(response.data);
+
+            return response.data
+        } catch (error) {
+            console.error("Error occurred:", error);
+        }
+
+    }
+
+    async function documentFixation(file, iin, id) {
+        try {
+            const fileSize = file.size;
+
+            const response = await axios.post(`${domenFull.value}/api/${id}/data`, file, {
+                headers: {
+                    'Content-Type': 'application/octet-stream',
+                    'Content-Length': fileSize,
+                    // Add any custom headers here if needed, e.g., authentication tokens
+                },
+                params: {
+                    signature: documentSign.value,
+                    settings: JSON.stringify({
+                        signersRequirements: [
+                            {iin: `IIN${iin}`}
+                        ]
+                    })
+                },
+            });
+
+            console.log("Register response:", response.data);
         } catch (error) {
             console.error("Error occurred:", error);
         }
     }
 
+
     return {
         auth,
-        signDocument,
         registerDocument,
+        documentFixation,
     };
 }

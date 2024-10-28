@@ -22,6 +22,18 @@ export const addTemplate = async (templateData: FormData) => {
   }
 };
 
+export const generateDocument = async (data) => {
+  try {
+    const response = await axios.post(`${API_DOCUMENTS_ENDPOINT}/generateDocument`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      responseType: 'blob',
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getDocument = async (documentId: string) => {
   try {
     const response = await axios.get(`${API_DOCUMENTS_ENDPOINT}/getDocument/${documentId}`);
@@ -33,8 +45,10 @@ export const getDocument = async (documentId: string) => {
 
 export const getTemplate = async (templateId: string) => {
   try {
-    const response = await axios.get(`${API_DOCUMENTS_ENDPOINT}/getTemplate/${templateId}`);
-    return response.data;
+    const response = await axios.get(`${API_DOCUMENTS_ENDPOINT}/getTemplate/${templateId}`, {
+      responseType: 'blob',
+    });
+    return response;
   } catch (error) {
     throw error;
   }

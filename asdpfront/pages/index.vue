@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import BaseTable from "~/components/base/BaseTable.vue";
+import {useDocument} from "~/composables/useDocument";
+
+const cardLinks = [
+  {link: "/", name: "Документы"},
+  {link: "/templates", name: "Шаблоны"},
+  {link: "/profile", name: "Профиль"},
+  {link: "/structure", name: "Структура"},
+]
 
 const labels = [
-  { key: 'id', text: 'ID', sortable: false },
-  { key: 'doc_name', text: 'Название Документа', sortable: true },
-  { key: 'whom', text: 'От кого', sortable: true },
-  { key: 'dueDate', text: 'Время', sortable: true },
+  { key: 'signPipelineId', text: 'ID', sortable: false },
+  { key: 'name', text: 'Название Документа', sortable: true },
+  { key: 'createdDate', text: 'Время', sortable: true },
   { key: 'status', text: 'Status', sortable: true },
 ]
 
@@ -30,9 +37,43 @@ const items = [
   },
 ]
 
-const startProcess = (id) => {
-  console.log("Gay")
-  closeModal()
+const data = ref({
+  templateId: "",
+  directorId: "",
+  teamlidId: "",
+})
+
+const {fetchTemplates, templates, handleGenerateDocument, fetchTemplate, } = useDocument()
+const {fetchDocumentsToSign, fetchPipelines, handleSignDocument, documents, pipelines, registerPipeline} = useSign()
+const {registerDocument, documentFixation} = useSigex()
+const {
+  directors,
+  teamleaders,
+  fetchDirectors,
+  fetchTeamleaders,
+} = useEmployee()
+
+const userStore = useUserStore()
+
+onMounted(() => {
+  fetchDirectors()
+  fetchTeamleaders()
+  fetchTemplates()
+  fetchPipelines(userStore.user.id)
+  fetchDocumentsToSign()
+})
+
+const startProcess = async () => {
+  const payload = {
+    templateId: data.value.templateId,
+    creatorEmployeeId: userStore.user.id,
+    directorId: data.value.directorId,
+    teamlidId: data.value.teamlidId,
+  }
+  const generatedDocument = await handleGenerateDocument(payload)
+  const {documentId, signId} = await registerDocument(generatedDocument, userStore.user.iin)
+  await documentFixation(generatedDocument, userStore.user.iin, documentId)
+  await registerPipeline(userStore.user.id, generatedDocument, data.value.teamlidId, data.value.directorId, documentId, signId)
 }
 
 const isModalOpen = ref(false);
@@ -49,33 +90,13 @@ const closeModal = () => {
 <template>
   <section class="grid grid-rows-1 gap-5">
     <div class="text-left mb-4 mt-6 grid grid-cols-1 gap-2 sm:mt-8 sm:grid-cols-2 lg:mb-0 lg:grid-cols-4 xl:gap-4">
-      <a href="/"
+      <a v-for="l in cardLinks"
+          :href="l.link"
          class="grid place-content-start pl-5 pb-20 space-y-6 overflow-hidden rounded-lg border border-gray-200 bg-white py-6 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
         <p class="text-left text-xs text-gray-500">
-          Документы
+          {{ l.name }}
         </p>
-        <p class="text-xl font-semibold text-gray-900 dark:text-white">Документы</p>
-      </a>
-      <a href="/documents"
-         class="grid place-content-start pl-5 pb-20 space-y-6 overflow-hidden rounded-lg border border-gray-200 bg-white py-6 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
-        <p class="text-left text-xs text-gray-500">
-          Шаблоны
-        </p>
-        <p class="text-xl font-semibold text-gray-900 dark:text-white">Шаблоны</p>
-      </a>
-      <a href="/profile"
-         class="grid place-content-start pl-5 pb-20 space-y-6 overflow-hidden rounded-lg border border-gray-200 bg-white py-6 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
-        <p class="text-left text-xs text-gray-500">
-          Профиль
-        </p>
-        <p class="text-xl font-semibold text-gray-900 dark:text-white">Профиль</p>
-      </a>
-      <a href="/structure"
-         class="grid place-content-start pl-5 pb-20 space-y-6 overflow-hidden rounded-lg border border-gray-200 bg-white py-6 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
-        <p class="text-left text-xs text-gray-500">
-          Структура
-        </p>
-        <p class="text-xl font-semibold text-gray-900 dark:text-white">Структура</p>
+        <p class="text-xl font-semibold text-gray-900 dark:text-white">{{ l.name }}</p>
       </a>
     </div>
 
@@ -85,7 +106,8 @@ const closeModal = () => {
           <BaseButton text="Запустить процесс" @click="openModal"/>
         </template>
       </ContentHeader>
-      <BaseTable :items="items" :labels="labels">
+      {{documents}} {{pipelines}}
+      <BaseTable :items="pipelines" :labels="labels">
         <template #actions="{item}">
           <button @click="toggleActions(item.id)" class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white">
             <span class="sr-only"> Actions </span>
@@ -102,15 +124,19 @@ const closeModal = () => {
       <!-- Заголовок модального окна -->
       <h2 class="text-lg font-bold mb-4">Форма</h2>
       <form @submit.prevent="startProcess">
-        <div class="mb-4">
-          <label for="identityIssueDate" class="block text-sm font-medium text-gray-700">Дата выдачи</label>
-          <input type="date" id="identityIssueDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
-        </div>
-
+        <BaseSelect :options="directors"
+                    v-model="data.directorId"
+                    defaultOption="Выберите Директора" />
+        <BaseSelect :options="teamleaders"
+                    v-model="data.teamlidId"
+                    defaultOption="Выберите Тимлида" />
+        <BaseSelect :options="templates"
+                    v-model="data.templateId"
+                    defaultOption="Выберите Шаблон" />
         <!-- Кнопки -->
-        <div class="flex justify-end space-x-4">
-          <button type="button" @click="closeModal" class="px-4 py-2 bg-gray-400 text-white rounded-lg">Закрыть</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Отправить</button>
+        <div class="flex justify-end space-x-4 my-4">
+          <button type="button" @click="closeModal" class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg">Закрыть</button>
+          <button type="submit" @clist="startProcess" class="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg">Запустить</button>
         </div>
       </form>
     </div>

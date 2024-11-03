@@ -3,6 +3,9 @@ import { ref } from "vue";
 import axios from "axios"; // Use axios for HTTP requests
 
 const IIN_CONST = "030303030303" //Employee IIN
+// const IIN_CONST = "020210650259" //Director IIN
+// const IIN_CONST = "001226550010" //Teamlead IIN
+
 export function useSigex() {
     const domenFull = ref("https://sigex.kz");
     const domen = "sigex.kz";
@@ -198,7 +201,9 @@ export function useSigex() {
                     settings: JSON.stringify({
                         signersRequirements: [
                             {iin: `IIN${iin}`}
-                        ]
+                        ],
+                        unique: [],
+
                     })
                 },
             });
@@ -209,29 +214,40 @@ export function useSigex() {
         }
     }
 
-    async function addSignToDocument(file, iin, id) {
+    async function addSignToDocument(file, id) {
         const signature = await signDocument(file)
 
         try {
-            const fileSize = file.size;
-
-            const response = await axios.post(`${domenFull.value}/api/${id}/buildDDC`, file, {
-                headers: {
-                    'Content-Type': 'application/octet-stream',
-                    'Content-Length': fileSize,
+            const response = await axios.post(`${domenFull.value}/api/${id}`, {
+                    signature: signature
                 },
-                params: {
-                    signature: signature,
-                    settings: JSON.stringify({
-                        signersRequirements: [
-                            {iin: `IIN${iin}`}
-                        ]
-                    })
-                },
-            });
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
 
-            return response
             console.log("Register response:", response.data);
+            return response
+        } catch (error) {
+            console.error("Error occurred:", error);
+        }
+    }
+
+    async function formDocument(file, id, fileName) {
+        console.log(file)
+        try {
+            // const formData = new FormData();
+            // formData.append("file", file);
+
+            const headers = {
+                'Content-Type': 'application/octet-stream',
+            };
+
+            const response = await axios.post(`${domenFull.value}/api/${id}/buildDDC?fileName=${fileName}`, file, { headers });
+
+            console.log("Register response:", response.data);
+            return response
         } catch (error) {
             console.error("Error occurred:", error);
         }
@@ -241,6 +257,7 @@ export function useSigex() {
         auth,
         registerDocument,
         documentFixation,
-        addSignToDocument
+        addSignToDocument,
+        formDocument
     };
 }

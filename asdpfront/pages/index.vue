@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import BaseTable from "~/components/base/BaseTable.vue";
 import {useDocument} from "~/composables/useDocument";
+import {API_DOCUMENTS_ENDPOINT} from "~/constants/consts";
+import * as fs from "node:fs";
 
 const cardLinks = [
   {link: "/", name: "Документы"},
@@ -45,7 +47,7 @@ const data = ref({
 
 const {fetchTemplates, templates, handleGenerateDocument, fetchDocument} = useDocument()
 const {fetchDocumentsToSign, fetchPipelines, handleSignDocument, documents, pipelines, registerPipeline} = useSign()
-const {registerDocument, documentFixation, addSignToDocument} = useSigex()
+const {registerDocument, documentFixation, addSignToDocument, formDocument} = useSigex()
 const {
   directors,
   teamleaders,
@@ -82,6 +84,8 @@ const startProcess = async () => {
   closeModal()
   await fetchPipelines(userStore.user.id)
 }
+const route = useRoute();
+const requiredRole = route.meta.requiredRole;
 
 const isModalOpen = ref(false);
 
@@ -96,8 +100,12 @@ const closeModal = () => {
   isModalOpen.value = false;
 };
 
-const downloadDoc = () => {
-  isModalOpen.value = false;
+const downloadDoc = async (item) => {
+  console.log(item)
+  const doc = await fetchDocument(item.name, item.documentId)
+  console.log(doc.size)
+  const response = await formDocument(doc, item.sigexDocumentId,`${item.name}.pdf`)
+  await downloadBase64File(response.data.ddc, `${item.name}.pdf`, "application/pdf")
 };
 
 const rejectDoc = async (item) => {
@@ -111,6 +119,31 @@ const rejectDoc = async (item) => {
   await fetchPipelines(userStore.user.id)
 }
 
+function downloadBase64File(base64Data, fileName, mimeType) {
+  // Create a Blob from the base64 data
+  const byteCharacters = atob(base64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: mimeType });
+
+  // Create a link element
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = fileName;
+
+  // Append the link to the body
+  document.body.appendChild(link);
+
+  // Simulate a click to trigger download
+  link.click();
+
+  // Remove the link after download
+  document.body.removeChild(link);
+}
+
 const signDoc = async (item) => {
   const payload = {
     signPipelineId: item.signPipelineId,
@@ -118,17 +151,25 @@ const signDoc = async (item) => {
     isSign: true
   }
   const doc = await fetchDocument(item.name, item.documentId)
-  await addSignToDocument(doc, userStore.user.iin, item.sigexDocumentId)
-  const response = await handleSignDocument(payload)
-  if (response.IsSuccess) {
-    await fetchDocumentsToSign(userStore.user.id)
-    await fetchPipelines(userStore.user.id)
+  const success = await addSignToDocument(doc, item.sigexDocumentId)
+  if (success) {
+    const response = await handleSignDocument(payload)
+    if (response.IsSuccess) {
+      await fetchDocumentsToSign(userStore.user.id)
+      await fetchPipelines(userStore.user.id)
+    }
   }
+}
+
+function formatDate(dateString) {
+  return format(new Date(dateString), "d MMMM yyyy 'г.,' HH:mm", { locale: ru });
 }
 </script>
 
 <template>
   <section class="grid grid-rows-1 gap-5">
+<!--    {{userStore.user}}-->
+<!--    required role {{requiredRole}}-->
     <div class="text-left mb-4 mt-6 grid grid-cols-1 gap-2 sm:mt-8 sm:grid-cols-2 lg:mb-0 lg:grid-cols-4 xl:gap-4">
       <a v-for="l in cardLinks"
           :href="l.link"
@@ -139,7 +180,6 @@ const signDoc = async (item) => {
         <p class="text-xl font-semibold text-gray-900 dark:text-white">{{ l.name }}</p>
       </a>
     </div>
-
     <div class="" v-if="userStore.user?.positionId !== 3">
       <ContentHeader title="Мои документы">
         <template #button>
@@ -147,12 +187,14 @@ const signDoc = async (item) => {
         </template>
       </ContentHeader>
       <BaseTable :items="pipelines" :labels="labels" v-if="pipelines.length > 0">
-        <template #actions="{item}" >
-          <button v-if="item.statusCode === 4" @click="downloadDoc(item.id)" class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white">
+        <template #actions="{item}">
+<!--          <a :href="`${API_DOCUMENTS_ENDPOINT}/getDocument/${item.documentId}`">-->
+          <button v-if="item.statusCode === 4" @click="downloadDoc(item)" class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white">
             <svg class="w-5 h-5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V4M7 14H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2m-1-5-4 5-4-5m9 8h.01"/>
             </svg>
           </button>
+<!--          </a>-->
         </template>
       </BaseTable>
       <div v-else class="no-data flex items-center justify-center text-gray-500 dark:text-gray-400 h-32">

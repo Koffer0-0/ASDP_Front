@@ -22,9 +22,9 @@ const userStore = useUserStore()
 
 const {fetchTemplates, templates, handleGenerateDocument, fetchDocument} = useDocument()
 
-const {fetchDocumentsToSign, fetchPipelines, handleSignDocument, documents, pipelines, registerPipeline} = useSign()
+const {fetchPipelines, pipelines, registerPipeline} = useSign()
 
-const {registerDocument, documentFixation, addSignToDocument, formDocument} = useSigex()
+const {registerDocument, documentFixation, formDocument} = useSigex()
 const {
   directors,
   teamleaders,

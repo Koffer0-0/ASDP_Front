@@ -1,6 +1,7 @@
 
 import { ref } from 'vue';
 import {getSignPipelines, signDocument, registerSignPipeline, getDocumentsToSign} from '@/server/signApi';
+import {formatDate} from "compatx";
 
 export function useSign() {
   const documents = ref([]);
@@ -9,15 +10,35 @@ export function useSign() {
 
   const fetchPipelines = async (userId) => {
     try {
-      pipelines.value = await getSignPipelines(userId);
+      const response = await getSignPipelines(userId);
+      pipelines.value = response.map(item => ({
+        ...item,
+        createdDate: formatDate(item.createdDate),
+      }));
     } catch (err) {
       error.value = err.message;
     }
   };
 
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    return date.toLocaleString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }) + ' г.';
+  }
+
   const fetchDocumentsToSign = async (userId) => {
     try {
-      documents.value = await getDocumentsToSign(userId);
+      const response = await getDocumentsToSign(userId);
+      documents.value = response.map(item => ({
+        ...item,
+        createdDate: formatDate(item.createdDate),
+      }));
     } catch (err) {
       error.value = err.message;
     }

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// definePageMeta({
+//   middleware: 'auth-role',
+//   requiredRole: 'user'
+// });
 
 import BaseTable from "~/components/base/BaseTable.vue";
 

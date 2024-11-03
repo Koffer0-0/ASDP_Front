@@ -21,6 +21,8 @@ const bottomList = [
   {icon: IconSettings, link: "/settings", name: "Настройки"},
   {icon: IconTurn, link: "/auth", name: "Выйти"}
 ]
+
+const userStore = useUserStore()
 </script>
 
 <template>
@@ -42,7 +44,7 @@ const bottomList = [
             </a>
           </li>
         </ul>
-        <ul class="space-y-2">
+        <ul class="space-y-2" v-if="userStore.user?.positionId === 3">
           <li v-for="i in secondList">
             <a
                 :href="i.link"

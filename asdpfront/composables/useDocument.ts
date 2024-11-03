@@ -1,16 +1,26 @@
 
 import { ref } from 'vue';
-import {loadTemplates, addTemplate, getDocument, getTemplate, generateDocument} from '@/server/documentApi';
+import {loadTemplates, addTemplate, getDocument, getTemplate, generateDocument, getTags} from '@/server/documentApi';
 
 export function useDocument() {
   const templates = ref([]);
   const document = ref(null);
   const template = ref(null);
+  const tags = ref([]);
   const error = ref(null);
 
   const fetchTemplates = async () => {
     try {
       templates.value = await loadTemplates();
+    } catch (err) {
+      error.value = err.message;
+    }
+  };
+
+  const fetchTags = async () => {
+    try {
+      const response = await getTags();
+      tags.value = response.data
     } catch (err) {
       error.value = err.message;
     }
@@ -97,6 +107,7 @@ export function useDocument() {
 
   return {
     templates,
+    tags,
     document,
     template,
     error,
@@ -104,6 +115,7 @@ export function useDocument() {
     fetchDocument,
     fetchTemplate,
     createTemplate,
-    handleGenerateDocument
+    handleGenerateDocument,
+    fetchTags
   };
 }

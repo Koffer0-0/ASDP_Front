@@ -55,3 +55,11 @@ export const getTemplate = async (templateId: string) => {
     throw error;
   }
 };
+
+export const getTags = async () => {
+  try {
+    return await axios.get(`${API_DOCUMENTS_ENDPOINT}/tags`)
+  } catch (error) {
+    throw error;
+  }
+};

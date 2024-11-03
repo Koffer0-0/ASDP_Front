@@ -16,17 +16,16 @@ export function useDocument() {
     }
   };
 
-  const fetchDocument = async (docName, documentId: string) => {
+  const fetchDocument = async (docName, documentId) => {
     try {
       const response = await getDocument(documentId);
-      const blob = response.data;
 
-      const fileData = new File([blob], docName, { type: blob.type });
+      // Convert response data to a Blob with PDF type
+      const blob = new Blob([response.data], { type: 'application/pdf' });
 
-      console.log('File downloaded successfully:', fileData);
-      return fileData;
+      return blob
     } catch (err) {
-      error.value = err.message;
+      console.error('Error downloading document:', err.message);
     }
   };
 
@@ -76,6 +75,25 @@ export function useDocument() {
       error.value = err.message;
     }
   };
+
+  function triggerFileDownload(blob, fileName) {
+    // Generate a URL for the blob
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary anchor element
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+
+    // Append the link to the body and trigger download
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up by removing the link and revoking the URL
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
 
   return {
     templates,
